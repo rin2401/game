@@ -1,4 +1,4 @@
 # game
 
-- [Pong](/pong)
-- [Snake](/snake)
+- [Pong](/game/pong)
+- [Snake](/game/snake)

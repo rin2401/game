@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Tình Yêu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ffafbd, #ffc3a0, #a18cd1, #fbc2eb);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .hearts {
+            display: flex;
+            gap: 8px;
+        }
+
+        .heart {
+            color: #ff6b6b;
+            font-size: 24px;
+        }
+
+        .level-info {
+            text-align: right;
+        }
+
+        .level-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .level-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #8a2be2;
+        }
+
+        .score-board {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .score-label {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .score {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4b0082;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #fff0f5, #e6e6fa);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+            border: 2px solid #ffb6c1;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .emoji {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid #dda0dd;
+            border-radius: 15px;
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 16px;
+            font-weight: 500;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .option-btn:hover {
+            background: #f8f0ff;
+            border-color: #9370db;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .message-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .message-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 350px;
+            margin: 20px;
+            transform: scale(0.8);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); }
+            50% { transform: scale(1); }
+            100% { transform: scale(0.95); }
+        }
+
+        .message-text {
+            font-size: 18px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .completed-screen {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            display: none;
+        }
+
+        .completed-emoji {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .completed-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .final-score {
+            font-size: 24px;
+            color: #8a2be2;
+            margin-bottom: 20px;
+        }
+
+        .completed-message {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #ff6b6b, #8a2be2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(138, 43, 226, 0.3);
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(138, 43, 226, 0.4);
+        }
+
+        .empty-heart {
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <!-- Game Screen -->
+    <div class="game-container" id="gameScreen">
+        <div class="header">
+            <div class="hearts" id="heartsContainer">
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+                <span class="heart">❤️</span>
+            </div>
+            <div class="level-info">
+                <div class="level-label">Cấp độ</div>
+                <div class="level-number" id="levelNumber">1/10</div>
+            </div>
+        </div>
+
+        <div class="score-board">
+            <div class="score-label">Điểm số</div>
+            <div class="score" id="score">0</div>
+        </div>
+
+        <div class="question-card">
+            <div class="emoji" id="questionEmoji">❤️</div>
+            <div class="question" id="questionText">Anh/em yêu gì nhất ở người yêu?</div>
+        </div>
+
+        <div class="options" id="optionsContainer">
+            <button class="option-btn" data-option="0">A. Nụ cười</button>
+            <button class="option-btn" data-option="1">B. Giọng nói</button>
+            <button class="option-btn" data-option="2">C. Sự quan tâm</button>
+            <button class="option-btn" data-option="3">D. Tất cả</button>
+        </div>
+
+        <div class="footer">
+            <p>🎮 Game tình yêu dành cho cặp đôi 🎮</p>
+        </div>
+    </div>
+
+    <!-- Completed Screen -->
+    <div class="completed-screen" id="completedScreen">
+        <div class="completed-emoji">🌸</div>
+        <div class="completed-title">Chúc Mừng!</div>
+        <div class="final-score">Điểm số của bạn: <span id="finalScore">0</span></div>
+        <div class="completed-message">
+            Tình yêu của bạn thật tuyệt vời! Hãy tiếp tục lan tỏa những điều ngọt ngào nhé!
+        </div>
+        <button class="restart-btn" id="restartBtn">Chơi Lại</button>
+    </div>
+
+    <!-- Message Overlay -->
+    <div class="message-overlay" id="messageOverlay">
+        <div class="message-content">
+            <div class="message-text" id="messageText"></div>
+        </div>
+    </div>
+
+    <script>
+        // Game data
+        const levels = [
+            {
+                id: 1,
+                question: "Anh/em yêu gì nhất ở người yêu?",
+                options: ["Nụ cười", "Giọng nói", "Sự quan tâm", "Tất cả"],
+                correct: 3,
+                emoji: "❤️"
+            },
+            {
+                id: 2,
+                question: "Ngày đặc biệt nào quan trọng nhất?",
+                options: ["Valentine", "Sinh nhật", "Kỷ niệm ngày yêu", "Mỗi ngày đều đặc biệt"],
+                correct: 3,
+                emoji: "⭐"
+            },
+            {
+                id: 3,
+                question: "Món quà ý nghĩa nhất là gì?",
+                options: ["Vàng bạc", "Hoa hồng", "Lời nói chân thành", "Đồ đắt tiền"],
+                correct: 2,
+                emoji: "🎁"
+            },
+            {
+                id: 4,
+                question: "Cách thể hiện tình yêu tốt nhất?",
+                options: ["Ôm hôn", "Nói lời yêu", "Hành động nhỏ hàng ngày", "Tặng quà"],
+                correct: 2,
+                emoji: "😊"
+            },
+            {
+                id: 5,
+                question: "Thời gian lý tưởng để hẹn hò?",
+                options: ["Buổi sáng", "Buổi trưa", "Buổi tối", "Bất cứ khi nào cùng nhau"],
+                correct: 3,
+                emoji: "☕"
+            },
+            {
+                id: 6,
+                question: "Điều gì khiến tình yêu bền vững?",
+                options: ["Sự giàu có", "Giao tiếp và thấu hiểu", "Vẻ ngoài", "Quà tặng đắt tiền"],
+                correct: 1,
+                emoji: "💬"
+            },
+            {
+                id: 7,
+                question: "Một bữa ăn romatic lý tưởng?",
+                options: ["Nhà hàng sang trọng", "Ăn ngoài trời dưới trăng", "Tự nấu tại nhà", "Đi buffet"],
+                correct: 2,
+                emoji: "🍽️"
+            },
+            {
+                id: 8,
+                question: "Khi cãi nhau nên làm gì?",
+                options: ["Im lặng", "Nói to", "Lắng nghe và giải quyết", "Rời đi"],
+                correct: 2,
+                emoji: "👂"
+            },
+            {
+                id: 9,
+                question: "Điều quan trọng trong mối quan hệ?",
+                options: ["Sự trung thực", "Sự lãng mạn", "Sự hài hước", "Tất cả các đáp án trên"],
+                correct: 3,
+                emoji: "🤝"
+            },
+            {
+                id: 10,
+                question: "Yếu tố tạo nên một ngày hoàn hảo?",
+                options: ["Tiền bạc", "Thành công", "Ở bên người mình yêu", "Mua sắm"],
+                correct: 2,
+                emoji: "✨"
+            }
+        ];
+
+        // Game state
+        let currentLevel = 1;
+        let score = 0;
+        let hearts = 3;
+
+        // DOM elements
+        const gameScreen = document.getElementById('gameScreen');
+        const completedScreen = document.getElementById('completedScreen');
+        const messageOverlay = document.getElementById('messageOverlay');
+        const messageText = document.getElementById('messageText');
+        const heartsContainer = document.getElementById('heartsContainer');
+        const levelNumber = document.getElementById('levelNumber');
+        const scoreElement = document.getElementById('score');
+        const questionEmoji = document.getElementById('questionEmoji');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const finalScore = document.getElementById('finalScore');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // Initialize game
+        function initGame() {
+            currentLevel = 1;
+            score = 0;
+            hearts = 3;
+            updateUI();
+            showCurrentQuestion();
+            gameScreen.style.display = 'block';
+            completedScreen.style.display = 'none';
+        }
+
+        // Update UI elements
+        function updateUI() {
+            // Update hearts
+            heartsContainer.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const heartSpan = document.createElement('span');
+                heartSpan.className = 'heart';
+                heartSpan.textContent = i < hearts ? '❤️' : '🤍';
+                heartsContainer.appendChild(heartSpan);
+            }
+
+            // Update level
+            levelNumber.textContent = `${currentLevel}/${levels.length}`;
+
+            // Update score
+            scoreElement.textContent = score;
+        }
+
+        // Show current question
+        function showCurrentQuestion() {
+            const level = levels[currentLevel - 1];
+            questionEmoji.textContent = level.emoji;
+            questionText.textContent = level.question;
+
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+
+            // Add new options
+            level.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = `${String.fromCharCode(65 + index)}. ${option}`;
+                button.setAttribute('data-option', index);
+                button.addEventListener('click', () => handleAnswer(index));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // Handle answer selection
+        function handleAnswer(selectedOption) {
+            const currentQuestion = levels[currentLevel - 1];
+
+            if (selectedOption === currentQuestion.correct) {
+                score += 10;
+                showMessage("Đúng rồi! Anh/em thật tinh tế 💕");
+                setTimeout(() => {
+                    if (currentLevel < levels.length) {
+                        currentLevel++;
+                        updateUI();
+                        showCurrentQuestion();
+                    } else {
+                        showCompletedScreen();
+                    }
+                }, 2000);
+            } else {
+                hearts--;
+                showMessage("Không sao, tình yêu luôn cần học hỏi 💖");
+                updateUI();
+                
+                setTimeout(() => {
+                    if (hearts <= 0) {
+                        showMessage("Game over! Nhưng tình yêu vẫn tiếp tục nhé!");
+                        setTimeout(() => {
+                            initGame();
+                        }, 2000);
+                    } else if (currentLevel < levels.length) {
+                        currentLevel++;
+                        updateUI();
+                        showCurrentQuestion();
+                    } else {
+                        showCompletedScreen();
+                    }
+                }, 2000);
+            }
+        }
+
+        // Show message overlay
+        function showMessage(text) {
+            messageText.textContent = text;
+            messageOverlay.classList.add('show');
+        }
+
+        // Hide message overlay
+        function hideMessage() {
+            messageOverlay.classList.remove('show');
+        }
+
+        // Show completed screen
+        function showCompletedScreen() {
+            finalScore.textContent = score;
+            gameScreen.style.display = 'none';
+            completedScreen.style.display = 'block';
+        }
+
+        // Event listeners
+        messageOverlay.addEventListener('click', hideMessage);
+        restartBtn.addEventListener('click', initGame);
+
+        // Start the game
+        initGame();
+    </script>
+</body>
+</html>
